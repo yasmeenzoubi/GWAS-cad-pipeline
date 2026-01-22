@@ -50,7 +50,7 @@ Output
 [37] "STUDY ACCESSION"            "GENOTYPING TECHNOLOGY"
 ```  
 
-I am interested in the columns "CHR_ID", "CHR_POS", "P-VALUE", the "SNPS" as these contain the SNPs, respective p-value, and the chromosome number and position it is located on.
+I am interested in the columns "CHR_ID", "CHR_POS", "P-VALUE", the "SNPS" as these contain the SNPs, respective p-values, and the chromosome number and position each SNP is located on.
 
 ## Manhattan plot
 A Manhattan plot is an illustraion that plots inidividual SNPs found in a dataset, where autosomal chromsomes (1-22) are represented on the x-axis and -log10(p-value) on the y-axis. They are called "Manhattan" as each plot resembles a "city skyline" where the taller the chromosome's corresponding SNPs are plotted, the more statistically significant it is. Therefore, it can be concluded that the chromosome possesses genes that exhibit a strong SNP signal in coronary artery disease.
