@@ -1,4 +1,4 @@
-# Genome-Wide Association Study of Coronary Artery Disease
+# Coronary Artery Disease Genome-Wide Association Study Project 
 
 ## Introduction/Quick Summary
 In this project I will be analyzing the single nucleotide polymorphisms (SNPs) mutations from the coronary artery disease genome-wide association study (GWAS) dataset obtained from the NHGRI-EBI GWAS Catalog. I will upload the SNP data to R, generate plots for visualization of the statistically significant SNPs, where SNPs are illustrated to be significantly associated with CAD via a qqplot and the most significant genes are observed in Chromosomes 6 and 9 via a Manhattan plot. I will then identify the SNPs that meet the GWAS p-value threshold of 5 x 10^-8, map them to Ensembl gene IDs database, and then annotate the SNPs the matched gene name. HMCN2 and CDKN2B-AS1 (ANRIL) were the genes the significant SNPs. HMCN2 is a gene which plays a role in cell adhesion, whereas ANRIL a noncoding RNA. SNPs present on both play a role in heart conditions such as CAD and hernias. Both HMCN2 and ANRIL are found in Chromosome 9 as confirmed via GenomicRanges and the Manhattan plot.
