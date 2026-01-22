@@ -1,7 +1,7 @@
 # Genome-Wide Association Study of Coronary Artery Disease
 
 ## Introduction/Quick Summary
-In this project I will be analyzing the single nucleotide polymorphisms (SNPs) mutations from the coronary artery disease (CAD) genome-wide association study (GWAS) dataset obtained from the NHGRI-EBI GWAS Catalog. I will upload the SNP data to R, generate plots for visualization of the statistically significant SNPs, where SNPs are illustrated to be significantly associated with CAD via a qqplot and the most significant genes are observed in chromosomes 6 and 9 via a Manhattan plot. I will then identify the SNPs that meet the GWAS p-value threshold of 5 x 10^-8, overlap them with Ensembl gene IDs database, and then map the SNPs the matched gene name. HMCN2 and CDKN2B-AS1 (ANRIL) were the genes the with the most significant SNPs. HMCN2 is a gene which plays a role in cell adhesion, whereas ANRIL a noncoding RNA linked to human diseases. SNPs present on both play a role in CAD and other various heart conditions. Both HMCN2 and ANRIL are found in chromosome 9 as confirmed via GenomicRanges analysis and the Manhattan plot.
+In this project I will be analyzing the single nucleotide polymorphisms (SNPs) mutations from the coronary artery disease (CAD) genome-wide association study (GWAS) dataset of 4552 associations obtained from the NHGRI-EBI GWAS Catalog. I will upload the SNP data to R, generate plots for visualization of the statistically significant SNPs, where SNPs are illustrated to be significantly associated with CAD via a qqplot and the most significant genes are observed in chromosomes 6 and 9 via a Manhattan plot. I will then identify the SNPs that meet the GWAS p-value threshold of 5 x 10^-8, overlap them with Ensembl gene IDs database, and then map the SNPs the matched gene name. HMCN2 and CDKN2B-AS1 (ANRIL) were the genes the with the most significant SNPs. HMCN2 is a gene which plays a role in cell adhesion, whereas ANRIL a noncoding RNA linked to human diseases. SNPs present on both play a role in CAD and other various heart conditions. Both HMCN2 and ANRIL are found in chromosome 9 as confirmed via GenomicRanges analysis and the Manhattan plot.
 This workflow can potentially be useful in research and clinical settings as analyzing significant SNPs and their physiological results can help with the development of targeted gene therapy to treat chronic and life-threatening diseases such as various heart conditions.
 
 The GWAS file can be downloaded here: https://www.ebi.ac.uk/gwas/efotraits/EFO_0001645
@@ -76,10 +76,10 @@ manhattan(cad,
 ```
 ![GWAS CAD Manhattan plot](cad_gwas_manhattan_plot.png)
 
-Interpretation: This dots in this Manhattan plot represent each of the significant SNPs were found in each chromosome (Chr 1 – 22). Meanwhile, the horizontal blue line represents the p-value threshold (y = 5), and the red line represents the GWAS threshold (y = 8). Chromosome SNP dots are colored in an alternate fashion between turquoise and pink for visual ease and distinction. Multiple chromosomes show genome-wide significant loci, with the strongest signals on chromosomes 6 and 9.  The most significant SNPs in chromosomes 6 and 9 possess a -log10(p)-value of ~240 (10^-240) and ~320 (10^-320) respectively. These are extremely small p-values that reflect strong associations from large GWAS meta-analyses. Chromosome 13 also possesses a SNP at y = ~320, but it is most likely an outlier. Therefore, all chromosomes possess significant SNPs, with Chromosomes 6 and 9 possessing the most significant ones. 
+Interpretation: This dots in this Manhattan plot represent the significant SNPs that were found in chromosomes 1-22. Meanwhile, the horizontal blue line represents the significance threshold (y = 5, 10e-5), and the red line represents the GWAS threshold (y = 8, 5e-8). Chromosome SNP dots are colored in an alternate fashion between turquoise and pink for visual ease and distinction. Multiple chromosomes show genome-wide significant loci, with the strongest signals present on chromosomes 6 and 9. The most significant SNPs in chromosomes 6 and 9 possess a -log10(p)-value of ~240 (10^-240) and ~320 (10^-320) respectively. These are extremely small p-values that reflect strong associations with CAD. Additionally, chromosome 13 also possesses a SNP at y = ~320. However, it is most likely an outlier. Therefore, all chromosomes possess significant SNPs, with Chromosomes 6 and 9 possessing the most significant ones. 
 
 ## QQPlot
-A qqplot will represent the correlation between the GWAS p-values and expected p-values. The more it lifts, the more statistical significance is observed in a given dataset.
+A qqplot will represent the correlation between the expected p-values, which follows the null hypothesis of no associations between SNPs and condition, and the observed GWAS p-values. The more the observed plot lifts, the more statistical significance between SNPs condition is observed in the given dataset.
 ```r
 qq(cad$`P-VALUE`, main = "QQ Plot of CAD GWAS p-values")
 ```
@@ -88,7 +88,7 @@ qq(cad$`P-VALUE`, main = "QQ Plot of CAD GWAS p-values")
 Interpretation: This red line in this plot represents what the data distribution would look like if it followed the null hypothesis (no statistically significant SNPs in CAD). The CAD dataset plot (thick black) lifts significantly higher with each increased -log10 value, which illustrates that the dataset SNPs are statistically significant in CAD.
 
 ## Identifying genes
-So far I have the SNPs and I would like to identify the genes they are located on. I want to identify the names of the genes the significant SNPs that meet the GWAS threshold of 5e-8 are located on, determine which chromosome these genes are located on, and determine the pathological consequence the SNPs on these specific genes contribute to. In order to do so I will need to access the Annotation Hub database, overlap and map my significant SNPs to the database's gene record, and then annotate.
+So far I have the SNPs in my dataset and I would like to identify the genes they are located on. I want to identify the names of the genes the significant SNPs that meet the GWAS threshold of 5e-8 are located on, determine which chromosome these genes are located on, and determine the pathological consequence the SNPs on these specific genes contribute to. In order to do so I will need to access the Annotation Hub database, overlap my significant SNPs with the database's gene record, and then annotate.
 
 ```r
 #I am interested in SNPs that meet the GWAS significance threshold (p < 5e-8)
@@ -107,6 +107,7 @@ Output
 ```
 ```r
 #Make SNPs into GRanges (extension of IRanges that includes chromosome name (seqnames) and strand direction (+ or -)
+#This step is required for subsequent overlapping step 
 snps_gr <- GRanges(
   seqnames = paste0("CHR_ID", top_snps$CHR_ID),
   ranges   = IRanges(start = top_snps$CHR_POS, end   = top_snps$CHR_POS),
@@ -134,10 +135,12 @@ GRanges object with 3203 ranges and 1 metadata column:
   -------
   seqinfo: 22 sequences from an unspecified genome; no seqlengths
 ```
+Next I want to open Annotation Hub and begin overlapping and annotating my SNPs to their respective genes.
+
 ```r
 #Access the hub
-ah <- AnnotationHub() #latest set is from 2025-10-29 which is recent.
-#Interested in Ensembl 
+ah <- AnnotationHub() #latest set is from 2025-10-29, which is recent.
+#I am interested in human genes, hg19 version, Ensembl database, and GRanges format.
 query(ah, c("Homo sapiens", "hg19", "Ensembl", "GRanges"))
 ```
 Output
@@ -157,7 +160,7 @@ AnnotationHub with 2 records
   AH98193 | human_database
 ```
 ```r
-#I will use record "AH5046" as it contains the Ensembl gene annotations
+#I will use record "AH5046" as it contains the Ensembl database gene annotations
 genes <- ah[["AH5046"]]
 genes
 ```
