@@ -211,31 +211,33 @@ UCSCData object with 204940 ranges and 5 metadata columns:
   seqinfo: 93 sequences (1 circular) from hg19 genome
 ```
 ```r
-#Harmonize SNP chromosome naming to match the Gene annotation style (e.g., changing 'CHR_ID6' to 'chr6')
+#Harmonize SNP chromosome naming in "snps_gr" to match the annotation "seqnames" style in "genes" (e.g., changing 'CHR_ID6' to 'chr6')
 seqlevels(snps_gr) <- gsub("CHR_ID", "", seqlevels(snps_gr))
 seqlevelsStyle(snps_gr) <- seqlevelsStyle(genes)
-#Overlap
+#Overlap SNPs to genes
 hits <- findOverlaps(snps_gr, genes)
-#Mapping
+#Mapping SNPs to genes
 snp_gene_map <- data.frame(
     snp_id = mcols(snps_gr)$snp[queryHits(hits)],
     transcript_id = mcols(genes)$name[subjectHits(hits)],
     stringsAsFactors = FALSE
 )
-#Annotating via EnsDb.Hsapiens.v75
+#Annotating via EnsDb.Hsapiens.v75 annotation package
 edb <- EnsDb.Hsapiens.v75
 my_keys <- as.character(unique(snp_gene_map$transcript_id))
-my_keys <- my_keys[my_keys != ""] # Remove empty keys to prevent syntax errors
+#Remove empty keys to prevent syntax errors
+my_keys <- my_keys[my_keys != ""]
+#map transcripts to their corresponding gene names and IDs
 gene_info <- ensembldb::select(edb, 
                                keys = unique(snp_gene_map$transcript_id), 
                                keytype = "TXID", 
                                columns = c("SYMBOL", "GENEID"))
-#FINAL MERGE
-# Map symbols back to your SNPs
+#Final merge
+#Map symbols back to SNPs
 final_map <- merge(snp_gene_map, gene_info, 
                    by.x = "transcript_id", 
                    by.y = "TXID")
-#Bring in the p-values from your original 'top_snps'
+#Attach p-values from 'top_snps'
 top_mapped <- merge(final_map, top_snps[, c("SNPS", "P-VALUE")], 
                     by.x = "snp_id", by.y = "SNPS")
 #View top SNPs
@@ -244,20 +246,13 @@ head(final_results)
 ```
 Output
 ```text
-         snp_id   transcript_id     SYMBOL          GENEID
-31784  rs687621 ENST00000487727      HMCN2 ENSG00000148357
-31785  rs687621 ENST00000455439      HMCN2 ENSG00000148357
-25083 rs2891168 ENST00000421632 CDKN2B-AS1 ENSG00000240498
-25091 rs2891168 ENST00000584020 CDKN2B-AS1 ENSG00000240498
-25099 rs2891168 ENST00000421632 CDKN2B-AS1 ENSG00000240498
-25107 rs2891168 ENST00000584816 CDKN2B-AS1 ENSG00000240498
-            P-VALUE
-31784 4.940656e-324
-31785 4.940656e-324
-25083 1.000000e-300
-25091 1.000000e-300
-25099 1.000000e-300
-25107 1.000000e-300
+         snp_id   transcript_id     SYMBOL          GENEID             P-VALUE
+31784  rs687621 ENST00000487727      HMCN2 ENSG00000148357 31784 4.940656e-324
+31785  rs687621 ENST00000455439      HMCN2 ENSG00000148357 31785 4.940656e-324
+25083 rs2891168 ENST00000421632 CDKN2B-AS1 ENSG00000240498 25083 1.000000e-300
+25091 rs2891168 ENST00000584020 CDKN2B-AS1 ENSG00000240498 25091 1.000000e-300
+25099 rs2891168 ENST00000421632 CDKN2B-AS1 ENSG00000240498 25099 1.000000e-300
+25107 rs2891168 ENST00000584816 CDKN2B-AS1 ENSG00000240498 25107 1.000000e-300
 ```
 Interpretation: The most statistically significant SNPs are rs687621 (4.940656e-324) and rs2891168 (1.000000e-300) found on genes HMCN2 and CDKN2B-AS1 respectively.
 
