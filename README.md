@@ -54,16 +54,18 @@ I am interested in the columns "CHR_ID", "CHR_POS", "P-VALUE", the "SNPS" as the
 
 ## Manhattan plot
 A Manhattan plot is an illustration that plots inidividual SNPs found in a dataset, where autosomal chromsomes (1-22) are represented on the x-axis and -log10(p-value) on the y-axis. It is called a "Manhattan" plot because each plot resembles a "city skyline" where the taller the chromosome's corresponding SNPs are plotted, the more statistically significant they are in CAD. A chromosome with a strong signal will therefore possess a gene that contains the SNP associated with the disease.
+Note that in order to plot a Manhattan plot, the chromosome ID, p-value, and position must be numeric. This Manhattan plot will graph autosomes (chromosomes 1-22) and exclude sex chromosomes (X and Y).
 
 ```r
-#Ensure P-VALUE is numeric (use backticks for the column name with a hyphen, otherwise R thinks it is a subtraction command).
+#Ensure P-VALUE is numeric (use backticks around P-VALUE, otherwise R recognizes the hyphen as a special character and thinks it's a subtraction command).
 cad$`P-VALUE` <- as.numeric(as.character(cad$`P-VALUE`)) 
-#Ensure CHR_ID is numeric (introduces NAs for X, Y, etc.)
+#Ensure CHR_ID is numeric (this will also introduce NAs for the X and Y chromosomes present in the dataset)
 cad$CHR_ID <- as.numeric(as.character(cad$CHR_ID))
-#Filter out the NAs before plotting (keeps only chromosomes 1-22)
+#Filter out the NAs before plotting to keep only chromosomes 1-22
 cad <- cad[!is.na(cad$CHR_ID), ]
 #Ensure CHR_POS is numeric
 cad$CHR_POS <- as.numeric(as.character(cad$CHR_POS))
+#Generate MAnhattan plot
 manhattan(cad,
           chr = "CHR_ID",
           bp = "CHR_POS",
