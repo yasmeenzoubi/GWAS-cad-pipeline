@@ -76,7 +76,7 @@ manhattan(cad,
 Interpretation: This dots in this Manhattan plot represent each of the significant SNPs were found in each chromosome (Chr 1 – 22). Meanwhile, the horizontal blue line represents the p-value threshold (y = 5), and the red line represents the GWAS threshold (y = 8). Chromosome SNP dots are colored in an alternate fashion between turquoise and pink for visual ease and distinction. Multiple chromosomes show genome-wide significant loci, with the strongest signals on chromosomes 6 and 9.  The most significant SNPs in chromosomes 6 and 9 possess a -log10(p)-value of ~240 (10^-240) and ~320 (10^-320) respectively. These are extremely small p-values that reflect strong associations from large GWAS meta-analyses. Chromosome 13 also possesses a SNP at y = ~320, but it is most likely an outlier. Therefore, all chromosomes possess significant SNPs, with Chromosomes 6 and 9 possessing the most significant ones. 
 
 ## QQPlot
-A qqplot will represent the correlation between the GWAS p-values and expected p-values. The more it lifts, the more statistical significance is observed in a givend ataset.
+A qqplot will represent the correlation between the GWAS p-values and expected p-values. The more it lifts, the more statistical significance is observed in a given dataset.
 ```r
 qq(cad$`P-VALUE`, main = "QQ Plot of CAD GWAS p-values")
 ```
