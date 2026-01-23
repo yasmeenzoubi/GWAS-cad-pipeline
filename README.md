@@ -65,7 +65,7 @@ cad$CHR_ID <- as.numeric(as.character(cad$CHR_ID))
 cad <- cad[!is.na(cad$CHR_ID), ]
 #Ensure CHR_POS is numeric
 cad$CHR_POS <- as.numeric(as.character(cad$CHR_POS))
-#Generate MAnhattan plot
+#Generate Manhattan plot
 manhattan(cad,
           chr = "CHR_ID",
           bp = "CHR_POS",
